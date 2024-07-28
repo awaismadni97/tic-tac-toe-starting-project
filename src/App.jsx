@@ -6,7 +6,12 @@ import Log from "./components/Log.jsx";
 import GameOver from "./components/GameOver.jsx";
 import { WINNING_COMBINATIONS } from "./winning-combinations.js";
 
-const initialGameBoard = [
+const PLAYERS = {
+  X: 'Player 1',
+  O: 'Player 2'
+}
+
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
@@ -22,18 +27,8 @@ function derivedActivePlayer(gameTurns) {
   return currentPlayer;
 }
 
-function App() {
-  const [players, setPlayers] = useState({
-    X: 'Player 1',
-    O: 'Player 2'
-  })
-  const [gameTurns, setGameTurns] = useState([]);
-
-  // const [activePlayer, setActivePlayer] = useState('X');
-
-  const activePlayer = derivedActivePlayer(gameTurns);
-
-  let gameBoard = [...initialGameBoard.map(innerArray => [...innerArray])];
+function deriveGameBoard(gameTurns) {
+  let gameBoard = [...INITIAL_GAME_BOARD.map(innerArray => [...innerArray])];
 
   for (const turn of gameTurns) {
     const { square, player } = turn;
@@ -42,6 +37,9 @@ function App() {
     gameBoard[row][col] = player;
   }
 
+  return gameBoard
+}
+function deriveWinner(gameBoard, players) {
   let winner;
   for (const combination of WINNING_COMBINATIONS) {
     const firstSquareSymbol = gameBoard[combination[0].row][combination[0].column]
@@ -55,6 +53,19 @@ function App() {
     }
   }
 
+  return winner;
+}
+
+function App() {
+  const [players, setPlayers] = useState(PLAYERS);
+  const [gameTurns, setGameTurns] = useState([]);
+
+  // const [activePlayer, setActivePlayer] = useState('X');
+
+  const activePlayer = derivedActivePlayer(gameTurns);
+  const gameBoard = deriveGameBoard(gameTurns);
+
+  const winner = deriveWinner(gameBoard, players);
   const hasDraw = gameTurns.length === 9 && !winner;
 
   function handleSelectSquare(rowIndex, colIndex) {
@@ -89,12 +100,12 @@ function App() {
   return <main>
     <div id="game-container">
       <ol id="players" className="highlight-player">
-        <Player initialName='Player 1'
+        <Player initialName={PLAYERS.X}
           symbol='X'
           isActive={activePlayer === 'X'}
           onChangeName={handlePlayerNameChange}
         />
-        <Player initialName='Player 2'
+        <Player initialName={PLAYERS.O}
           symbol='O'
           isActive={activePlayer === 'O'}
           onChangeName={handlePlayerNameChange}
