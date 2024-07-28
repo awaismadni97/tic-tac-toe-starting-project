@@ -39,6 +39,7 @@ function deriveGameBoard(gameTurns) {
 
   return gameBoard
 }
+
 function deriveWinner(gameBoard, players) {
   let winner;
   for (const combination of WINNING_COMBINATIONS) {
